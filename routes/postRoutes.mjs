@@ -1,6 +1,7 @@
 import express from 'express';
 import posts from '../data/posts.mjs';
 import users from '../data/users.mjs';
+import comments from '../data/comments.mjs';
 
 const router = express.Router();
 
@@ -122,18 +123,20 @@ router.get('/', (req, res) => {
 //@route GET /api/posts/:id/comments
 //@desc Retrieves all comments made on the post with the specified id.
 //@access public
-router.get('/:id/comments', (req, res, next) => {
-    const postId = req.params.id;
-    const post = posts.find((post) => post.id == postId);
+router.get('/:id/comments', (req, res) => {
+    const postId = parseInt(req.params.id);
+    const post = posts.find((post) => post.id === postId);
+    
     if (!post) {
-        return res.status(404).json({ msg: 'post not found' });
+        return res.status(404).json({ msg: 'Post not found' });
     }
 
-    const userPosts = posts.filter((post) => post.postId == postId);
-    if (userPosts.length === 0) {
-        return res.status(404).json({ msg: 'No posts found for this user' });
+    const postComments = comments.filter((comment) => comment.postId === postId);
+    if (postComments.length === 0) {
+        return res.status(404).json({ msg: 'No comments found for this post' });
     }
-    res.json(userPosts);
+    
+    res.json(postComments);
 });
 
 // The logic for filtering by userId is now handled in the base '/' GET route above.
